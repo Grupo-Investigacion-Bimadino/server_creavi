@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -14,6 +14,26 @@ import { HistoriesModule } from './histories/histories.module';
 import { Structure } from './structures/structure.module';
 import { ContentModule } from './content/content.module';
 import { ColaborativeTeamsModule } from './colaborative_teams/colaborative_teams.module';
+import { FilesModule } from './files/files.module';
+import { DmsModule } from './dms/dms.module';
+import { Options } from 'pino-http';
+import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
+
+const LoggerModule = PinoLoggerModule.forRoot({
+  pinoHttp: {
+    level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
+    transport: {
+      targets: [
+        {
+          target: 'pino-pretty',
+          options: { singleLine: true, colorize: true },
+          level: 'trace',
+        },
+      ],
+    },
+  } as Options,
+  exclude: [{ method: RequestMethod.ALL, path: '/api/health' }],
+});
 
 @Module({
   imports: [
@@ -34,6 +54,9 @@ import { ColaborativeTeamsModule } from './colaborative_teams/colaborative_teams
     Structure,
     ContentModule,
     ColaborativeTeamsModule,
+    FilesModule,
+    DmsModule,
+    LoggerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
