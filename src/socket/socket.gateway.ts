@@ -15,8 +15,9 @@ import { RoomService } from '../room/room.service';
   namespace: '/',
 })
 export class SocketGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly roomsService: RoomService) { }
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
+  constructor(private readonly roomsService: RoomService) {}
 
   @WebSocketServer() server: Server;
 
@@ -68,7 +69,7 @@ export class SocketGateway
 
   @SubscribeMessage('sendTestMessage')
   handleTestMessage(client: Socket, payload: any) {
-    console.log('Test message', payload);
+    // console.log('Test message', payload);
     // Este método maneja el evento 'testMessage' enviado desde el cliente
     // Puedes emitir un mensaje de vuelta al cliente si es necesario
     this.server.emit('responseTestMessage', `Servidor: ${payload}`);

@@ -25,6 +25,10 @@ export class ElementController {
     return this.elementService.findAll();
   }
 
+  @Get('/templates')
+  findAllTemplates() {
+    return this.elementService.findAllTemplates();
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.elementService.findOne(id);
