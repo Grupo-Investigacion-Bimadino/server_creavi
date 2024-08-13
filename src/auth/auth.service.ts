@@ -20,7 +20,6 @@ export class AuthService {
   ) {}
 
   async signUp(singUp: SignUpDto): Promise<{ token: string }> {
-    
     const { username, email, password, picture, role } = singUp;
     const hasedPassword = await bcrypt.hash(password, 10);
 
@@ -34,6 +33,7 @@ export class AuthService {
       });
 
       const token = await this.jwtService.sign({ id: user._id });
+
       return { token };
     } catch (error) {
       if (error?.code === 11000) {
@@ -44,8 +44,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<{ token: string }> {
-    
-    const { email, password } = loginDto;    
+    const { email, password } = loginDto;
     const user = await this.userModel.findOne({ email });
 
     if (!user) {

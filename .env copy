@@ -1,0 +1,16 @@
+# local database
+DB_URI = mongodb://localhost:27017/creavi
+ORIGIN_HOST_CORS = http://localhost:3000
+
+# Server database
+# DB_URI = 
+
+# Server authentication
+JWT_SECRET = secret
+JWT_EXPIRE = 1d
+JWT_ALGORITHM = HS256
+
+# AWS services
+AWS_ACCESS_KEY_ID=TuAccessKeyId
+AWS_SECRET_ACCESS_KEY=TuSecretAccessKey
+AWS_REGION=TuRegion

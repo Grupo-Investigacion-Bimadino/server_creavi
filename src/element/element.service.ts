@@ -18,7 +18,14 @@ export class ElementService {
   }
 
   async findAll() {
-    const elements = await this.elementModel.find().exec();
+    const elements = await this.elementModel
+      .find({ type: { $ne: 'template' } })
+      .exec();
+    return elements;
+  }
+
+  async findAllTemplates() {
+    const elements = await this.elementModel.find({ type: 'template' }).exec();
     return elements;
   }
 
