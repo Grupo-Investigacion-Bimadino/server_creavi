@@ -9,24 +9,26 @@ import { Version } from './schemas/version.schema';
 
 @Injectable()
 export class VersionService {
-
   constructor(
     private structureService: StructureService,
     private historiesService: HistoriesService,
     @InjectModel(Version.name) private versionModel: Model<Version>,
-  ) { }
+  ) {}
 
   async createVersion(elements: CreateVcDto) {
-    // create structure elements    
+    // create structure elements
     let structureCreated = await this.structureService.create({ elements });
     let structure = structureCreated._id;
 
-    // create version component    
-    let versionCreated = await this.versionModel.create({ structure, number: '1.0.0' });
+    // create version component
+    let versionCreated = await this.versionModel.create({
+      structure,
+      number: '1.0.0',
+    });
     let version = versionCreated._id;
 
-    // create history component    
-    let historiesData = { actual_version: version, versions: [version] }
+    // create history component
+    let historiesData = { actual_version: version, versions: [version] };
     let historiesCreated = await this.historiesService.create(historiesData);
     let history = historiesCreated._id;
 
@@ -34,7 +36,11 @@ export class VersionService {
     await this.structureService.update(structure.toString(), { version });
 
     // update history field on version with id_history
-    await this.versionModel.findByIdAndUpdate(version, { $set: { histories: history } }, { new: true });
+    await this.versionModel.findByIdAndUpdate(
+      version,
+      { $set: { histories: history } },
+      { new: true },
+    );
 
     return { version, history };
   }
@@ -48,26 +54,39 @@ export class VersionService {
         .select('-_id structure');
 
       if (!versionStructure) {
-        throw new Error('No se encontró ninguna versión con el ID proporcionado');
+        throw new Error(
+          'No se encontró ninguna versión con el ID proporcionado',
+        );
       }
 
       let { structure, _id: version } = versionStructure;
-      let { elements } = structure;
+      let { elements } = structure[0];
 
       // comparar estructura actual con la nueva estructura y encontrar las diferencias - ok- jvc services
-      let { added, modified, deleted } = await this.structureService.deepDiff(elements, updateElements);
+      let { added, modified, deleted } = await this.structureService.deepDiff(
+        elements,
+        updateElements,
+      );
 
       // guardar la nueva estructura - ok - jvc structure
-      let structureCreated = await this.structureService.create({ elements: updateElements, added, modified, deleted, version });
+      let structureCreated = await this.structureService.create({
+        elements: updateElements,
+        added,
+        modified,
+        deleted,
+        version,
+      });
 
       // actualizar la version en JSONStructure actual con la nueva estructura - ok - version
       const updateOps = { $set: { structure: structureCreated._id } };
-      let versionUpdated = await this.versionModel.findByIdAndUpdate(id, updateOps, { new: true });
+      let versionUpdated = await this.versionModel.findByIdAndUpdate(
+        id,
+        updateOps,
+        { new: true },
+      );
 
       return { versionUpdated, structureCreated };
-
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
     }
   }
