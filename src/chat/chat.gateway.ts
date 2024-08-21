@@ -20,7 +20,7 @@ export class ChatGateway implements OnModuleInit {
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
-      console.info('Chat connected', socket.id);
+      // console.info('Chat connected', socket.id);
     });
   }
 

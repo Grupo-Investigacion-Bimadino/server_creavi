@@ -4,34 +4,32 @@ import { Structure } from 'src/structures/structure.module';
 
 @Schema({ timestamps: true })
 export class Element extends Document {
-  // nombre del componente, por ejemplo "Select"
+  @Prop({ required: true })
+  name: string;
+
+  @Prop({ required: true })
+  version: string;
+
   @Prop()
-  name: String;
-  // version actual del componente
-  @Prop()
-  version: String;
-  // tipo de componente por ejemplo form_component,
-  @Prop()
-  type: String;
-  // popiedades de configuracion del componente, por ejemplo { "label": "Pais", "multiple": false, "v-model": "pais", "value": "pais", "comments": [], "items": [] }
+  type: string;
+
   @Prop({ type: Object })
-  properties: Object;
-  // datos recolectadoos por el componente, por ejemplo { "select": { option1: {text:'Colombia', value:'CO'} } }
+  properties: Record<string, any>;
+
   @Prop({ type: Object })
-  data: Object;
-  // componentes contenidos en el componente raiz o padre, se llaman o agregan por _id
+  data: Record<string, any>;
+
   @Prop({ type: Types.ObjectId, ref: 'Structure' })
   structure: Structure;
-  // version actual del componente, se llama o agrega por _id, siempre que hay una actualizacion, se actualiza el id del branch en este campo.
+
   @Prop({ type: Types.ObjectId, ref: 'User' })
   createdBy: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Branch' })
-  trunk: Types.ObjectId;
+  mainBranch: Types.ObjectId;
 
   @Prop({ type: [Types.ObjectId], ref: 'Branch' })
-  versions: Types.ObjectId[];
-  // Otras propiedades adicionales si es necesario
+  versionHistory: Types.ObjectId[];
 }
 
 export const ElementSchema = SchemaFactory.createForClass(Element);
