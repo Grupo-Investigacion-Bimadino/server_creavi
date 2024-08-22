@@ -1,29 +1,31 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, SchemaType, Types } from 'mongoose';
-import * as mongoose from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { Version } from 'src/version/schemas/version.schema';
 
-@Schema({
-    timestamps: true,
-})
-
+@Schema({ timestamps: true })
 export class Structure extends Document {
-    _id: mongoose.Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Version', required: true })
+  version: Version;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Version' })
-    version: Version;
+  @Prop({ type: Object, required: true })
+  elements: Record<string, any>;
 
-    @Prop({ type: {} })
-    elements: {};
+  @Prop({ type: Object })
+  added: Record<string, any>;
 
-    @Prop({ type: {} })
-    added: {};
+  @Prop({ type: Object })
+  modified: Record<string, any>;
 
-    @Prop({ type: {} })
-    modified: {};
+  @Prop({ type: Object })
+  deleted: Record<string, any>;
+  @Prop({ type: Number })
+  x: number;
 
-    @Prop({ type: {} })
-    deleted: {};
+  @Prop({ type: Number })
+  y: number;
+
+  @Prop({ type: Number })
+  z: number;
 }
 
 export const StructureSchema = SchemaFactory.createForClass(Structure);

@@ -6,69 +6,105 @@ import { HistoriesService } from 'src/histories/histories.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Version } from './schemas/version.schema';
+import { Structure } from 'src/structures/schemas/structure.schema';
 
 @Injectable()
 export class VersionService {
-
   constructor(
-    private structureService: StructureService,
-    private historiesService: HistoriesService,
-    @InjectModel(Version.name) private versionModel: Model<Version>,
-  ) { }
+    private readonly structureService: StructureService,
+    private readonly historiesService: HistoriesService,
+    @InjectModel(Version.name) private readonly versionModel: Model<Version>,
+  ) {}
 
   async createVersion(elements: CreateVcDto) {
-    // create structure elements    
-    let structureCreated = await this.structureService.create({ elements });
-    let structure = structureCreated._id;
+    try {
+      const structureCreated = await this.structureService.create({ elements });
+      const versionCreated = await this.versionModel.create({
+        structure: structureCreated._id,
+        version: '1.0.0',
+      });
 
-    // create version component    
-    let versionCreated = await this.versionModel.create({ structure, number: '1.0.0' });
-    let version = versionCreated._id;
+      const historiesCreated = await this.historiesService.create({
+        actualVersion: versionCreated._id,
+        versions: [versionCreated._id],
+      });
 
-    // create history component    
-    let historiesData = { actual_version: version, versions: [version] }
-    let historiesCreated = await this.historiesService.create(historiesData);
-    let history = historiesCreated._id;
+      await this.structureService.update(structureCreated._id.toString(), {
+        version: versionCreated._id,
+      });
 
-    // update version field on structure with id_version
-    await this.structureService.update(structure.toString(), { version });
+      await this.versionModel.findByIdAndUpdate(
+        versionCreated._id,
+        { $set: { histories: historiesCreated._id } },
+        { new: true },
+      );
 
-    // update history field on version with id_history
-    await this.versionModel.findByIdAndUpdate(version, { $set: { histories: history } }, { new: true });
-
-    return { version, history };
+      return { version: versionCreated._id, history: historiesCreated._id };
+    } catch (error) {
+      console.error('Error creating version:', error);
+      throw new Error('Could not create version');
+    }
   }
 
   async updateVersion(id: string, updateElements: UpdateVcDto) {
     try {
-      // buscar version y obtener estructura y prioopiedades del componente - ok -version
-      let versionStructure = await this.versionModel
+      const version = await this.versionModel
         .findById(id)
         .populate('structure')
-        .select('-_id structure');
+        .exec();
 
-      if (!versionStructure) {
-        throw new Error('No se encontró ninguna versión con el ID proporcionado');
+      if (!version) {
+        throw new Error('Version not found');
       }
 
-      let { structure, _id: version } = versionStructure;
-      let { elements } = structure;
+      const structure = version.structure as Structure;
+      const { elements } = structure;
 
-      // comparar estructura actual con la nueva estructura y encontrar las diferencias - ok- jvc services
-      let { added, modified, deleted } = await this.structureService.deepDiff(elements, updateElements);
+      const { added, modified, deleted } = await this.structureService.deepDiff(
+        elements,
+        updateElements,
+      );
 
-      // guardar la nueva estructura - ok - jvc structure
-      let structureCreated = await this.structureService.create({ elements: updateElements, added, modified, deleted, version });
+      // Determina cuál eje debe incrementarse
+      let { x, y, z } = structure;
 
-      // actualizar la version en JSONStructure actual con la nueva estructura - ok - version
-      const updateOps = { $set: { structure: structureCreated._id } };
-      let versionUpdated = await this.versionModel.findByIdAndUpdate(id, updateOps, { new: true });
+      if (added.length > 0 || deleted.length > 0) {
+        // Cambios significativos (Major)
+        x += 1;
+        y = 0;
+        z = 0;
+      } else if (modified.length > 0) {
+        // Cambios menores (Minor)
+        y += 1;
+        z = 0;
+      } else {
+        // Cambios mínimos (Patch)
+        z += 1;
+      }
 
-      return { versionUpdated, structureCreated };
+      // Crear nueva estructura con el versionamiento actualizado
+      const structureUpdated = await this.structureService.create({
+        elements: updateElements,
+        added,
+        modified,
+        deleted,
+        version: id,
+        x,
+        y,
+        z,
+      });
 
-    }
-    catch (error) {
-      console.log(error);
+      // Actualizar el campo de estructura en la versión actual
+      version.structure = structureUpdated;
+
+      // Guardar la versión actualizada
+      await version.save();
+
+      // Retornar la versión actualizada y la estructura actualizada
+      return { versionUpdated: version, structureUpdated };
+    } catch (error) {
+      console.error('Error updating version:', error);
+      throw new Error('Could not update version');
     }
   }
 
@@ -83,56 +119,4 @@ export class VersionService {
   removeVersion(id: string) {
     return `This action removes a # vc`;
   }
-
-  // ! This method is not used
-
-  /*
-  async saveNewVersion(data: any) {
-  }
-
-  async updateVersion(newJsonComponent: any) {
-    // se debe obtener el estado de la version, comparar con la nueva, guardar la nueva y almacenar los cambios, la vieja version pasa a rama
-    // let { added, modified, deleted } = await this.deepDiff(obj1, obj2);
-  }
-
-  getHistoryVersions(): any[] {
-    // Obtiene la lista de versiones anteriores
-    return []
-  }
-
-  getPreviousVersion(): any {
-    // Obtiene la versión anterior
-
-  }
-
-  getNextVersion(): any {
-    // Obtiene la siguiente versión
-
-  }
-
-  applyVersionToSource(version: any): void {
-    // Aplica una versión específica al archivo fuente
-
-  }
-
-  getInitialVersion(): any {
-    // Obtiene el objeto fuente de la versión inicial
-
-  }
-
-  getLatestVersion(): any {
-    // Obtiene el objeto fuente de la última versión
-
-  }
-
-  applyInitialVersion(): void {
-    // Aplica la versión inicial al archivo fuente
-
-  }
-
-  applyLatestVersion(): void {
-    // Aplica la última versión al archivo fuente
-
-  }
-  */
 }

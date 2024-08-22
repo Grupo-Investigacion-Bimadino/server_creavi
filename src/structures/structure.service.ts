@@ -8,49 +8,48 @@ import { Structure } from './schemas/structure.schema';
 @Injectable()
 export class StructureService {
   constructor(
-    @InjectModel(Structure.name) private structureModel: Model<Structure>
-  ) { }
+    @InjectModel(Structure.name)
+    private readonly structureModel: Model<Structure>,
+  ) {}
 
-  async deepDiff(json_a: any, json_b: any) {
-    // compare two objects and return the differences
-    // return added, modified and deleted properties    
-    return await this.compareObjects(json_a, json_b, '');
+  async deepDiff(jsonA: any, jsonB: any) {
+    const { added, modified, deleted } = this.compareObjects(jsonA, jsonB);
+    return { added, modified, deleted };
   }
 
   compareObjects(o1: any, o2: any, path: string = '') {
-    let added: any = {};
-    let modified: any = {};
-    let deleted: any = {};
+    const added: Record<string, any> = {};
+    const modified: Record<string, any> = {};
+    const deleted: Record<string, any> = {};
 
     const processProperty = (key: string, value1: any, value2: any) => {
       const newPath = path ? `${path}.${key}` : key;
-      if (typeof value1 === 'object' && value1 !== null && typeof value2 === 'object' && value2 !== null) {
-        const { added: addedInner, modified: modifiedInner, deleted: deletedInner } = this.compareObjects(value1, value2, newPath);
-        added = { ...added, ...addedInner };
-        modified = { ...modified, ...modifiedInner };
-        deleted = { ...deleted, ...deletedInner };
-      } else {
-        if (value1 !== value2) {
-          modified[newPath] = { old: value1, new: value2 };
-        }
+      if (
+        typeof value1 === 'object' &&
+        value1 &&
+        typeof value2 === 'object' &&
+        value2
+      ) {
+        const diff = this.compareObjects(value1, value2, newPath);
+        Object.assign(added, diff.added);
+        Object.assign(modified, diff.modified);
+        Object.assign(deleted, diff.deleted);
+      } else if (value1 !== value2) {
+        modified[newPath] = { old: value1, new: value2 };
       }
     };
 
-    // Process properties in o1
     for (const key in o1) {
-      if (o1.hasOwnProperty(key)) {
-        if (!o2.hasOwnProperty(key)) {
-          deleted[`${path ? `${path}.` : ''}${key}`] = o1[key];
-        } else {
-          processProperty(key, o1[key], o2[key]);
-        }
+      if (!(key in o2)) {
+        deleted[path ? `${path}.${key}` : key] = o1[key];
+      } else {
+        processProperty(key, o1[key], o2[key]);
       }
     }
 
-    // Process properties in o2 that are not in o1
     for (const key in o2) {
-      if (o2.hasOwnProperty(key) && !o1.hasOwnProperty(key)) {
-        added[`${path ? `${path}.` : ''}${key}`] = o2[key];
+      if (!(key in o1)) {
+        added[path ? `${path}.${key}` : key] = o2[key];
       }
     }
 
@@ -58,7 +57,7 @@ export class StructureService {
   }
 
   async create(newStructure: CreateJvcDto) {
-    let structure = await this.structureModel.create(newStructure);
+    const structure = await this.structureModel.create(newStructure);
     return structure;
   }
 
@@ -72,7 +71,9 @@ export class StructureService {
 
   update(id: string, updateDto: UpdateJvcDto) {
     const updateOps = { $set: updateDto };
-    let structure = this.structureModel.findByIdAndUpdate(id, updateOps, { new: true });
+    let structure = this.structureModel.findByIdAndUpdate(id, updateOps, {
+      new: true,
+    });
     return structure;
   }
 

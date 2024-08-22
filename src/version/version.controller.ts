@@ -1,15 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { VersionService } from './version.service';
 import { CreateVcDto } from './dto/create-vc.dto';
 import { UpdateVcDto } from './dto/update-vc.dto';
 
 @Controller('versions')
 export class VersionController {
-  constructor(private readonly versionService: VersionService) { }
+  constructor(private readonly versionService: VersionService) {}
 
-  @Post('')
-  create(@Body() createVcDto: CreateVcDto) {
-    return this.versionService.createVersion(createVcDto);
+  @Post()
+  async create(@Body() createVcDto: CreateVcDto) {
+    return await this.versionService.createVersion(createVcDto);
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateVcDto: UpdateVcDto) {
+    return await this.versionService.updateVersion(id, updateVcDto);
   }
 
   @Get(':id')
@@ -20,11 +33,6 @@ export class VersionController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.versionService.findOneComponentVersion(id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVcDto: UpdateVcDto) {
-    return this.versionService.updateVersion(id, updateVcDto);
   }
 
   @Delete(':id')
