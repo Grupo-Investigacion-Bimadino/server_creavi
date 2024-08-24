@@ -12,8 +12,19 @@ export class ElementService {
   ) {}
 
   async create(createElementDto: CreateElementDto) {
+    // create element
     const element = new this.elementModel(createElementDto);
     const newElement = await element.save();
+    let id = newElement._id as string;
+
+    // create version
+    // const createVcDto: CreateVcDto = newElement as CreateVcDto;
+    // const version = await this.versionService.createVersion(createVcDto);
+
+    // console.log('version element', version);
+    // update element with version
+    // await this.update(id, { version: version.version });
+
     return newElement;
   }
 
@@ -42,7 +53,7 @@ export class ElementService {
   async update(id: string, updateElementDto: UpdateElementDto) {
     const updatedElement = await this.elementModel.findByIdAndUpdate(
       id,
-      updateElementDto,
+      updateElementDto as any,
       { new: true },
     );
     return updatedElement;

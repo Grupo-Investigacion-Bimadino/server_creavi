@@ -12,9 +12,9 @@ import { StructureSchema } from 'src/structures/schemas/structure.schema';
   imports: [
     MongooseModule.forFeature([{ name: 'Version', schema: VersionSchema }]),
     MongooseModule.forFeature([{ name: 'Histories', schema: HistoriesSchema }]),
-    MongooseModule.forFeature([{ name: 'Structure', schema: StructureSchema }])
+    MongooseModule.forFeature([{ name: 'Structure', schema: StructureSchema }]),
   ],
   controllers: [VersionController],
   providers: [VersionService, StructureService, HistoriesService],
 })
-export class VersionModule { }
+export class VersionModule {}
