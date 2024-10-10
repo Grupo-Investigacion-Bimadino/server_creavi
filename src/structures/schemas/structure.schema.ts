@@ -4,10 +4,10 @@ import { Version } from 'src/version/schemas/version.schema';
 
 @Schema({ timestamps: true })
 export class Structure extends Document {
-  @Prop({ type: Types.ObjectId, ref: 'Version', required: true })
-  version: Version;
+  @Prop({ type: String, default: '1.0.0' })
+  version: string;
 
-  @Prop({ type: Object, required: true })
+  @Prop({ type: Object })
   elements: Record<string, any>;
 
   @Prop({ type: Object })
@@ -18,6 +18,7 @@ export class Structure extends Document {
 
   @Prop({ type: Object })
   deleted: Record<string, any>;
+
   @Prop({ type: Number })
   x: number;
 
@@ -26,6 +27,9 @@ export class Structure extends Document {
 
   @Prop({ type: Number })
   z: number;
+
+  @Prop({ type: Types.ObjectId, ref: 'Version' })
+  versions: Version;
 }
 
 export const StructureSchema = SchemaFactory.createForClass(Structure);

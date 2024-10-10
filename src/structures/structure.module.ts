@@ -4,12 +4,12 @@ import { StructureController } from './structure.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StructureSchema } from './schemas/structure.schema';
 
-
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Structure', schema: StructureSchema }]),
   ],
   controllers: [StructureController],
   providers: [StructureService],
+  exports: [StructureService],
 })
-export class Structure { }
+export class StructureModule {}

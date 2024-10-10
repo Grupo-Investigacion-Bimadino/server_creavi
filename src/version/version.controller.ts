@@ -6,8 +6,11 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { VersionService } from './version.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateVcDto } from './dto/create-vc.dto';
 import { UpdateVcDto } from './dto/update-vc.dto';
 
@@ -15,9 +18,15 @@ import { UpdateVcDto } from './dto/update-vc.dto';
 export class VersionController {
   constructor(private readonly versionService: VersionService) {}
 
+  // @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() createVcDto: CreateVcDto) {
-    return await this.versionService.createVersion(createVcDto);
+  async create(@Request() req, @Body() createVcDto: CreateVcDto) {
+    const properties = createVcDto.properties;
+    return await this.versionService.createVersion(
+      createVcDto,
+      req.user,
+      properties,
+    );
   }
 
   @Patch(':id')

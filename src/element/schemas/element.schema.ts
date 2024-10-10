@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Structure } from 'src/structures/structure.module';
+import { StructureModule } from 'src/structures/structure.module';
 
 @Schema({ timestamps: true })
 export class Element extends Document {
@@ -20,7 +20,7 @@ export class Element extends Document {
   data: Record<string, any>;
 
   @Prop({ type: Types.ObjectId, ref: 'Structure' })
-  structure: Structure;
+  structure: StructureModule;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   createdBy: Types.ObjectId;
@@ -29,7 +29,13 @@ export class Element extends Document {
   mainBranch: Types.ObjectId;
 
   @Prop({ type: [Types.ObjectId], ref: 'Branch' })
-  versionHistory: Types.ObjectId[];
+  versions: Types.ObjectId[];
+
+  @Prop({ type: String })
+  category: string;
+
+  @Prop({ type: String })
+  label: string;
 }
 
 export const ElementSchema = SchemaFactory.createForClass(Element);
