@@ -6,18 +6,23 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ElementService } from './element.service';
 import { CreateElementDto } from './dto/create-element.dto';
 import { UpdateElementDto } from './dto/update-element.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import e from 'express';
 
 @Controller('elements')
 export class ElementController {
   constructor(private readonly elementService: ElementService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createElementDto: CreateElementDto) {
-    return this.elementService.create(createElementDto);
+  create(@Request() req, @Body() createElementDto: CreateElementDto) {
+    return this.elementService.create(createElementDto, req.user);
   }
 
   @Get()
