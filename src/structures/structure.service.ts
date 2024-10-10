@@ -5,6 +5,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Structure } from './schemas/structure.schema';
 
+interface NewStructure {
+  version: string;
+  elements: Record<string, any>;
+  added: Record<string, any>;
+  modified: Record<string, any>;
+  deleted: Record<string, any>;
+  x: string;
+  y: string;
+  z: string;
+}
 @Injectable()
 export class StructureService {
   constructor(
@@ -57,8 +67,9 @@ export class StructureService {
   }
 
   async create(newStructure: CreateJvcDto) {
-    const structure = await this.structureModel.create(newStructure);
-    return structure;
+    const resultStructure = await this.structureModel.create(newStructure);
+    console.log('structure', resultStructure);
+    return resultStructure;
   }
 
   findAll() {

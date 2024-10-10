@@ -12,6 +12,9 @@ export class Version extends Document {
   @Prop({ required: true })
   version: string;
 
+  @Prop({ type: Types.ObjectId, ref: 'version_idersion' })
+  version_id: Version;
+
   @Prop({ type: Types.ObjectId, ref: 'User' })
   author: User;
 
@@ -33,8 +36,8 @@ export class Version extends Document {
   @Prop({ type: String, default: 'No features' })
   features: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Histories' })
-  histories: Histories;
+  /*@Prop({ type: Types.ObjectId, ref: 'Histories' })
+  histories: Histories;*/
 }
 
 export const VersionSchema = SchemaFactory.createForClass(Version);

@@ -11,7 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { ElementModule } from './element/element.module';
 import { VersionModule } from './version/version.module';
 import { HistoriesModule } from './histories/histories.module';
-import { Structure } from './structures/structure.module';
+import { StructureModule } from './structures/structure.module';
 import { ContentModule } from './content/content.module';
 import { ColaborativeTeamsModule } from './colaborative_teams/colaborative_teams.module';
 import { FilesModule } from './files/files.module';
@@ -51,7 +51,7 @@ const LoggerModule = PinoLoggerModule.forRoot({
     ElementModule,
     VersionModule,
     HistoriesModule,
-    Structure,
+    StructureModule,
     ContentModule,
     ColaborativeTeamsModule,
     FilesModule,

@@ -10,5 +10,6 @@ import { StructureSchema } from './schemas/structure.schema';
   ],
   controllers: [StructureController],
   providers: [StructureService],
+  exports: [StructureService],
 })
-export class Structure {}
+export class StructureModule {}
