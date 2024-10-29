@@ -14,7 +14,7 @@ import { RoomService } from './room.service';
   namespace: '/',
 })
 export class RoomGateway implements OnModuleInit {
-  constructor(private readonly roomService: RoomService) { }
+  constructor(private readonly roomService: RoomService) {}
 
   @WebSocketServer() server: Server;
 
@@ -38,6 +38,7 @@ export class RoomGateway implements OnModuleInit {
   @SubscribeMessage('newRoom')
   async onNewRoom(@MessageBody() body: any) {
     // save on RoomService and returns room id
+    console.log('onNewRoom', body);
     let { ownerId, name, description } = body;
     const room = await this.roomService.createRoom(ownerId, name, description);
 
@@ -49,6 +50,7 @@ export class RoomGateway implements OnModuleInit {
   @SubscribeMessage('listRooms')
   async onListRooms() {
     const rooms = await this.roomService.getRoomList();
+    console.log('onListRooms', rooms);
     this.server.emit('onListRooms', { message: 'List rooms', rooms });
   }
 }

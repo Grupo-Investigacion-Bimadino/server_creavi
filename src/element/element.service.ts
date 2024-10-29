@@ -68,7 +68,7 @@ export class ElementService {
   }
 
   async update(id: string, updateElementDto: UpdateElementDto) {
-    const structure = updateElementDto.structure as CreateVcDto;
+    /*const structure = updateElementDto.structure as CreateVcDto;
     const structureVersion = await this.versionService.updateVersion(
       id,
       structure,
