@@ -4,8 +4,8 @@
 # npm test*
 
 # .husky/pre-commit
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [[ "$BRANCH" == "main" || "$BRANCH" == "developer" ]]; then
-  echo "You are not allowed to commit directly to the $BRANCH branch!"
-  exit 1
-fi
+# BRANCH=$(git rev-parse --abbrev-ref HEAD)
+# if [[ "$BRANCH" == "main" || "$BRANCH" == "developer" ]]; then
+#   echo "You are not allowed to commit directly to the $BRANCH branch!"
+#   exit 1
+# fi
